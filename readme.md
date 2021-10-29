@@ -1,16 +1,13 @@
 SSR
 所谓的SSR其实就是服务端渲染，也就是我们常说的直出。
 优势
-9. ⾸屏加载速度⾮常快
-;. 请求能够放在服务端，减少响应时间
-<. 有利于爬⾍搜索
+1. ⾸屏加载速度⾮常快
+2. 请求能够放在服务端，减少响应时间
+3. 有利于爬⾍搜索
 劣势
-9. 对服务器提出更⾼的要求，⽣成虚拟DOM如果相对较⻓的运⾏和计算耗时；
-;. 由于cgi拉取和vdom直出后才吐出HTML⻚⾯，FMP虽然提前了，但是FP相对
-延迟了；
-延迟了；
-<. SSR渲染后，由于仍然需要进⾏依赖、vue初始化，⻚⾯可交互时间并没有较⼤
-改善。
+1. 对服务器提出更⾼的要求，⽣成虚拟DOM如果相对较⻓的运⾏和计算耗时；
+2. 由于cgi拉取和vdom直出后才吐出HTML⻚⾯，FMP虽然提前了，但是FP相对延迟了；
+3. SSR渲染后，由于仍然需要进⾏依赖、vue初始化，⻚⾯可交互时间并没有较⼤改善。
 简单实现 vue SSR
 新建⼀个⽂件夹vue-ssr-demo，进⼊其中执⾏如下命令：
 // 安装模块
@@ -42,8 +39,8 @@ word: 'Hello World!'
 const Vue = require('vue');
 //vue 实例化过程中插⼊数据
 const app = new Vue({
-data: data_vue,
-template: "<div>{{word}}</div>"
+    data: data_vue,
+    template: "<div>{{word}}</div>"
 });
 //第⼆步，创建⼀个renderer
 const renderer = require('vue-server-renderer').createRenderer();
@@ -59,9 +56,9 @@ vue ⼀样；运⾏ server.js 结果如下，数据 data_vue 已经插⼊到 vue
 <div data-server-rendered="true">Hello World!</div>
 第⼆种，模板插值，这⾥我们也直接先放代码：
 const data_vue = {
-word: 'Hello World!'
+    word: 'Hello World!'
 };
-};
+
 const data_tpl = {
 people: 'Hello People!'
 };
@@ -82,28 +79,22 @@ if(err){
  }
 console.log(html);
 });
-这⾥我们增加了数据 data_tpl，你会发现，在 renderToString ⽅法中传⼊了这个参
-数，那么这个参数作⽤在哪⾥呢？这就要看下官⽹中关于 createRenderer 和
-renderToString ⽅法的介绍了，
+这⾥我们增加了数据 data_tpl，你会发现，在 renderToString ⽅法中传⼊了这个参数，那么这个参数作⽤在哪⾥呢？
+这就要看下官⽹中关于 createRenderer 和renderToString ⽅法的介绍了，
 createRenderer: 使⽤（可选的）选项创建⼀个 Renderer 实例。 const {
 createRenderer } = require('vue-server-renderer') const renderer =
-createRenderer({ / 选项 / }) 在选项中，就有⼀个参数叫 template，看官⽹怎么说
-的：
+createRenderer({ / 选项 / }) 在选项中，就有⼀个参数叫 template，看官⽹怎么说的：
 template: 为整个⻚⾯的 HTML 提供⼀个模板。此模板应包含注释 <!--vue-ssr￾outlet-->，作为渲染应⽤程序内容的占位符。
-为整个⻚⾯的 HTML 提供⼀个模板。此模板应包含注释 <!--vue-ssr-outlet-->，作为
-为整个⻚⾯的 HTML 提供⼀个模板。此模板应包含注释 <!--vue-ssr-outlet-->，作为
-渲染应⽤程序内容的占位符。
+为整个⻚⾯的 HTML 提供⼀个模板。此模板应包含注释 <!--vue-ssr-outlet-->，作为渲染应⽤程序内容的占位符。
 模板还⽀持使⽤渲染上下⽂ (render context) 进⾏基本插值：
 使⽤双花括号 (double-mustache) 进⾏ HTML 转义插值 (HTML-escaped
 interpolation)；
 使⽤三花括号 (triple-mustache) 进⾏ HTML 不转义插值 (non-HTML-escaped
 interpolation)。
-根据介绍，在创建 renderer 实例时，可以通过 template 参数声明⼀个模板，这个
-模板⽤来⼲嘛呢？就⽤来挂载 vue 模板渲染完成之后⽣成的 HTML。这⾥要注意⼀
-下，当创建 renderer 实例时没有声明 template 参数，那么默认渲染完就是 vue 模
-板⽣成的 HTML；当创建 renderer 实例时声明了 template 参数，⼀定要在模板中
-增加⼀句注释 “” 作为 vue 模板插⼊的占位符，否则会报找不到插⼊模板位置的错
-误。
+
+根据介绍，在创建 renderer 实例时，可以通过 template 参数声明⼀个模板，这个模板⽤来⼲嘛呢？就⽤来挂载 vue 模板渲染完成之后⽣成的 HTML。
+这⾥要注意⼀下，当创建 renderer 实例时没有声明 template 参数，那么默认渲染完就是 vue 模板⽣成的 HTML；
+当创建 renderer 实例时声明了 template 参数，⼀定要在模板中增加⼀句注释 “” 作为 vue 模板插⼊的占位符，否则会报找不到插⼊模板位置的错误。
 再次运⾏ server.js ，结果如下，vue 模板已成功插⼊，且 template 模板中的
 {{people}} 变量也因在 renderToString ⽅法中第⼆位参数的传⼊，显示了数据：
 <div data-server-rendered="true">Hello World!</div><div>Hello
